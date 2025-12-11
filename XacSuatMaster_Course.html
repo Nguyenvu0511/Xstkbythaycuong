@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Thuyết Trình Nhóm 3</title>
+    <!-- Favicon mới -->
+    <link rel="icon" href="https://lh3.googleusercontent.com/pw/AP1GczOlA0VVKGlPQyQHYTLsJ7lxTqie3Avy47Pfto3r3Eea--NAJDMRNQ9iNBBr3TQoI_PCw_9193SB2LYZ2zZ_sv7jUUHeKL-K5-JhkzCM6J6L-f9rC1n2=w2400" type="image/x-icon">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Fonts: Patrick Hand (Viết tay) & Quicksand (Thân thiện) -->
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                        hand: ['Patrick Hand', 'cursive'],
+                    },
+                    colors: {
+                        chalkboard: '#2d3748', // Màu bảng đen
+                        paper: '#fffdf5',      // Màu giấy ngà
+                        highlighter: '#fef08a', // Màu bút nhớ vàng
+                        pen: '#1e3a8a',        // Màu mực xanh
+                        redpen: '#ef4444',     // Màu mực đỏ chấm bài
+                    },
+                    boxShadow: {
+                        'paper': '2px 3px 5px rgba(0,0,0,0.1), 0 0 1px rgba(0,0,0,0.1)',
+                        'sticker': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Hiệu ứng giấy ô ly */
+        body {
+            background-color: #f3f4f6;
+            background-image: 
+                linear-gradient(#e5e7eb 1px, transparent 1px),
+                linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Hiệu ứng bàn gỗ (Intro) */
+        #intro-screen {
+            background-color: #5d4037;
+            background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 4px);
+        }
+
+        /* Bìa vở */
+        .notebook-cover {
+            background: #3b82f6; /* Màu xanh bìa vở */
+            background-image: linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 100%;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
+            border-radius: 10px 4px 4px 10px;
+            border-left: 15px solid #1e3a8a; /* Gáy sách */
+        }
+
+        .label-sticker {
+            background: white;
+            border: 4px double #1e3a8a;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Hiệu ứng bảng đen Header */
+        .blackboard {
+            background-color: #2d3436;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%239C92AC' fill-opacity='0.1' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border-bottom: 8px solid #5d4037; /* Khung gỗ */
+        }
+
+        /* Hiệu ứng tờ giấy Note */
+        .note-paper {
+            background: #fffdf5;
+            position: relative;
+            border: 1px solid #e2e8f0;
+            background-image: linear-gradient(90deg, transparent 39px, #fca5a5 39px, #fca5a5 41px, transparent 41px),
+                              linear-gradient(#e5e7eb .05em, transparent .05em);
+            background-size: 100% 100%, 100% 28px;
+            line-height: 28px;
+        }
+
+        /* Hiệu ứng băng dính (Tape) */
+        .tape {
+            background-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            backdrop-filter: blur(2px);
+            transform: rotate(-2deg);
+            position: absolute;
+            top: -15px; left: 50%; margin-left: -50px;
+            width: 100px; height: 30px;
+            border-left: 1px dashed rgba(0,0,0,0.1); border-right: 1px dashed rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        
+        .hand-font { font-family: 'Patrick Hand', cursive; }
+        
+        /* Animation */
+        .tab-content { display: none; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .tab-content.active { display: block; }
+        @keyframes popIn { 
+            from { opacity: 0; transform: scale(0.95) translateY(10px); } 
+            to { opacity: 1; transform: scale(1) translateY(0); } 
+        }
+
+        /* Transition Screen */
+        .slide-up { animation: slideUp 0.8s forwards ease-in-out; }
+        @keyframes slideUp { to { transform: translateY(-100%); opacity: 0; } }
+
+        .fade-in-content { animation: fadeIn 1s forwards ease-in-out; opacity: 0; }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* Table viết tay */
+        .doodle-table th, .doodle-table td {
+            border: 2px solid #2d3748;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.1rem;
+        }
+
+        /* Logo xoay tròn */
+        .logo-spin {
+            animation: spin 10s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="h-screen flex flex-col text-slate-800 font-sans overflow-hidden">
+
+    <!-- ================= INTRO SCREEN (TRANG BẮT ĐẦU) ================= -->
+    <div id="intro-screen" class="fixed inset-0 z-50 flex items-center justify-center">
+        <div class="notebook-cover w-full max-w-lg p-10 text-center relative transform rotate-1 transition hover:rotate-0 duration-500">
+            <!-- Decoration -->
+            <div class="absolute -top-10 -right-10 text-6xl transform rotate-12 drop-shadow-lg">✏️</div>
+            <div class="absolute -bottom-5 -left-10 text-6xl transform -rotate-12 drop-shadow-lg">☕</div>
+
+            <!-- Label -->
+            <div class="label-sticker p-8 bg-white">
+                <h1 class="font-hand text-5xl font-bold text-blue-900 mb-2">Báo Cáo Môn Học</h1>
+                <h2 class="font-sans text-xl text-slate-500 uppercase tracking-widest mb-6 border-b-2 border-slate-200 pb-2">Xác Suất Thống Kê</h2>
+                
+                <div class="space-y-4">
+                    <div class="text-center">
+                        <p class="font-hand text-3xl text-slate-700 font-bold">Thực hiện bởi:</p>
+                        <div class="bg-yellow-100 p-2 transform -rotate-2 mt-2 shadow-sm border border-yellow-200 inline-block">
+                            <span class="font-hand text-4xl text-blue-700 font-bold px-4">NHÓM 3</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="enterApp()" 
+                            class="w-full bg-red-500 hover:bg-red-600 text-white font-hand text-3xl py-3 rounded shadow-lg transform active:scale-95 transition mt-6 border-b-4 border-red-700">
+                        Mở Vở Ngay! 📖
+                    </button>
+                </div>
+            </div>
+            
+            <p class="font-hand text-white/80 mt-4 text-lg">Designed by Nhóm trưởng Nguyễn Hoàng Vũ🌟
+        </div>
+    </div>
+
+    <!-- ================= MAIN APP LAYOUT ================= -->
+    <div id="main-app" class="h-full flex flex-col hidden opacity-0">
+        
+        <!-- HEADER: BẢNG ĐEN -->
+        <header class="blackboard text-white p-4 z-20 flex justify-between items-center h-20 shadow-xl">
+            <div class="flex items-center gap-4">
+                <!-- LOGO XOAY TRÒN -->
+                <img src="https://lh3.googleusercontent.com/pw/AP1GczOlA0VVKGlPQyQHYTLsJ7lxTqie3Avy47Pfto3r3Eea--NAJDMRNQ9iNBBr3TQoI_PCw_9193SB2LYZ2zZ_sv7jUUHeKL-K5-JhkzCM6J6L-f9rC1n2=w2400" 
+                     alt="Logo Nhóm" 
+                     class="w-16 h-16 rounded-full border-2 border-white shadow-lg logo-spin object-cover">
+                <div>
+                    <h1 class="font-hand text-3xl leading-none text-white tracking-wide">Biến Ngẫu Nhiên & Phân Phối Xác Suất
+                    <p class="font-hand text-lg text-gray-300">Thực hiện bởi: <span id="display-group-name" class="text-yellow-300 font-bold">Nhóm 3</span> ✨</p>
+                </div>
+            </div>
+
+            <!-- Navigation: Thẻ Tab giấy -->
+            <nav class="hidden md:flex gap-4">
+                <button onclick="switchTab('bai1')" class="nav-btn active font-hand text-xl px-4 py-1 rounded-t-lg bg-yellow-100 text-slate-800 border-t-2 border-x-2 border-yellow-200 hover:bg-white transform hover:-translate-y-1 transition" data-target="bai1">
+                    📝 Bài 1: Khái Niệm
+                </button>
+                <button onclick="switchTab('bai2')" class="nav-btn font-hand text-xl px-4 py-1 rounded-t-lg bg-slate-600 text-gray-300 border-t-2 border-x-2 border-slate-500 hover:bg-slate-500 hover:text-white transform hover:-translate-y-1 transition" data-target="bai2">
+                    📏 Bài 2: Đo Đạc
+                </button>
+                <button onclick="switchTab('bai3')" class="nav-btn font-hand text-xl px-4 py-1 rounded-t-lg bg-slate-600 text-gray-300 border-t-2 border-x-2 border-slate-500 hover:bg-slate-500 hover:text-white transform hover:-translate-y-1 transition" data-target="bai3">
+                    📚 Bài 3: Phân Phối Khác
+                </button>
+                <button onclick="switchTab('maytinh')" class="nav-btn font-hand text-xl px-4 py-1 rounded-t-lg bg-slate-600 text-gray-300 border-t-2 border-x-2 border-slate-500 hover:bg-slate-500 hover:text-white transform hover:-translate-y-1 transition" data-target="maytinh">
+                    🧮 Máy Tính
+                </button>
+            </nav>
+            
+            <!-- Mobile Menu -->
+            <button class="md:hidden text-2xl text-white"><i class="fa-solid fa-bars"></i></button>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-6xl mx-auto">
+            
+            <!-- ================= TAB 1: BÀI HỌC 1 ================= -->
+            <div id="bai1" class="tab-content active pb-10">
+                <!-- Title Sticky Note -->
+                <div class="max-w-md mx-auto bg-yellow-200 p-4 shadow-sticker transform -rotate-1 mb-8 text-center relative font-hand">
+                    <div class="w-3 h-3 rounded-full bg-red-800 absolute top-2 left-1/2 -translate-x-1/2 shadow-inner"></div> <!-- Đinh ghim -->
+                    <h2 class="text-4xl font-bold text-red-700">Mục 5.1: Nhập Môn</h2>
+                    <p class="text-xl text-slate-700">Biến Ngẫu Nhiên & Phân Phối</p>
+                </div>
+
+                <!-- Card: Biến ngẫu nhiên -->
+                <div class="note-paper shadow-paper rounded-sm p-8 pl-14 mb-8 relative max-w-3xl mx-auto bg-white">
+                    <div class="tape"></div> <!-- Băng dính -->
+                    <h3 class="font-hand text-3xl font-bold text-blue-800 mb-4 border-b-2 border-blue-200 inline-block">1. Biến ngẫu nhiên là gì? 🤔</h3>
+                    
+                    <div class="space-y-2 text-lg leading-relaxed">
+                        <p>Nó là một biến số (X, Y) nhưng giá trị thì... <strong>hên xui (ngẫu nhiên)</strong>.</p>
+                        <p>Khác hẳn với <span class="font-mono bg-gray-200 px-1 rounded">2x = 4</span> trong đại số nha!</p>
+                        
+                        <div class="bg-yellow-50 border-2 border-yellow-400 border-dashed rounded-lg p-4 mt-4 relative">
+                            <i class="fa-solid fa-star text-yellow-400 text-2xl absolute -top-4 -left-3 bg-white rounded-full"></i>
+                            <h4 class="font-hand font-bold text-2xl text-yellow-700">Ví dụ: Gieo Súc Sắc 🎲</h4>
+                            <ul class="list-disc ml-6 marker:text-yellow-500">
+                                <li>Chưa gieo thì chưa biết ra mặt nào.</li>
+                                <li>Gọi <strong>X</strong> là số chấm.</li>
+                                <li>X = {1, 2, 3, 4, 5, 6}.</li>
+                            </ul>
+                            <p class="font-hand text-xl text-red-500 mt-2 transform rotate-1">=> Đó chính là Biến Ngẫu Nhiên!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Rời rạc vs Liên tục -->
+                <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                    <!-- Rời rạc -->
+                    <div class="bg-white shadow-sticker rounded-xl p-6 border-4 border-green-200 transform rotate-1 hover:rotate-0 transition">
+                        <h3 class="font-hand text-3xl font-bold text-green-700 mb-2"><i class="fa-solid fa-cubes"></i> Rời Rạc</h3>
+                        <p class="text-slate-600 italic mb-2 font-hand text-xl">(Discrete)</p>
+                        <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+                            <p class="font-bold text-green-900">Đếm được!</p>
+                            <p>1, 2, 3 người. Không có 1.5 người.</p>
+                        </div>
+                        <p class="mt-2 text-sm text-slate-500">VD: Số cuộc gọi, số chấm súc sắc.</p>
+                    </div>
+
+                    <!-- Liên tục -->
+                    <div class="bg-white shadow-sticker rounded-xl p-6 border-4 border-slate-200 transform -rotate-1 hover:rotate-0 transition opacity-70">
+                        <h3 class="font-hand text-3xl font-bold text-slate-600 mb-2"><i class="fa-solid fa-wave-square"></i> Liên Tục</h3>
+                        <p class="text-slate-600 italic mb-2 font-hand text-xl">(Continuous)</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <p class="font-bold text-slate-900">Đo lường được!</p>
+                            <p>Cao 1m70, 1m70.5...</p>
+                        </div>
+                        <p class="mt-2 text-sm text-slate-500">VD: Chiều cao, Nhiệt độ.</p>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-6">
+                     <span class="inline-block bg-yellow-300 text-red-700 font-hand text-2xl px-4 py-2 transform -rotate-2 shadow-sm border-2 border-yellow-400">
+                        ⭐ Lưu ý: Chương này chỉ học BIẾN RỜI RẠC thôi nhé!
+                     </span>
+                </div>
+
+                <!-- Card: Phân phối & Quy tắc -->
+                <div class="note-paper shadow-paper rounded-sm p-8 pl-14 mt-8 max-w-3xl mx-auto bg-white">
+                    <div class="tape"></div>
+                    <h3 class="font-hand text-3xl font-bold text-purple-800 mb-4 inline-block">2. Hai Quy Tắc Vàng 🔑</h3>
+                    <p class="text-lg">Muốn biết cái bảng có chuẩn không, phải soi 2 điều này:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="bg-purple-50 p-4 rounded-lg border-2 border-purple-200 border-dashed">
+                            <strong class="font-hand text-2xl text-purple-700 block">Quy tắc 1:</strong>
+                            <p>Xác suất \(P(X)\) phải từ <strong>0 đến 1</strong>.</p>
+                            <p class="text-red-500 font-hand text-lg mt-1">(Cấm số âm, cấm > 1)</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg border-2 border-purple-200 border-dashed">
+                            <strong class="font-hand text-2xl text-purple-700 block">Quy tắc 2:</strong>
+                            <p>Tổng tất cả \(P(X)\) cộng lại phải <strong>bằng 1</strong>.</p>
+                            <p class="text-red-500 font-hand text-lg mt-1">(Tròn 100% đó)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thực hành -->
+                <div class="mt-10 max-w-4xl mx-auto">
+                    <h3 class="font-hand text-4xl font-bold text-slate-700 mb-6 text-center underline decoration-wavy decoration-blue-400">📝 Bài Tập Thực Hành 1</h3>
+                    
+                    <div class="bg-white p-6 rounded-2xl shadow-sticker border-2 border-slate-300 relative">
+                        <div class="absolute -top-3 -left-3 bg-red-500 text-white font-hand font-bold px-3 py-1 rounded shadow transform -rotate-12">Bài 5.1.3</div>
+                        <p class="font-hand text-xl mb-4 text-slate-600">Kiểm tra xem các bảng sau Đúng hay Sai?</p>
+
+                        <!-- Ảnh bảng số liệu -->
+                        <img src="https://lh3.googleusercontent.com/pw/AP1GczORUn1GBp1bNGqQ77vBHcDrFeaFd67Fk0iEtYu5GUNp304CWOUKB36OqcP11MNsVmlMzaiiBme7DEWfDwhR0nUyxWq5wqzGLAtG4txz4d6M4rZg71lh=w2400" 
+                             alt="Bảng số liệu ví dụ 5.1.3" 
+                             class="w-full max-w-lg mx-auto mb-6 rounded-lg border-2 border-slate-200 shadow-sm" />
+
+                        <div class="space-y-4">
+                            <!-- Bảng B -->
+                            <div class="group border-2 border-slate-200 rounded-lg p-4 hover:border-red-300 transition bg-slate-50">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-lg">Bảng (b): <span class="font-mono bg-white px-2 rounded border text-base">-1.0, 1.5, ...</span></span>
+                                    <button onclick="toggleExplain('ex-b')" class="bg-white border-2 border-slate-300 text-slate-700 font-hand font-bold px-3 py-1 rounded shadow hover:bg-red-50 hover:text-red-600 transition">Soi Lỗi 🔍</button>
+                                </div>
+                                <div id="ex-b" class="hidden mt-3 bg-red-50 p-3 rounded border border-red-200 font-hand text-xl text-red-800">
+                                    <p>❌ <strong>Sai bét!</strong></p>
+                                    <p>- Có số âm (-1.0)</p>
+                                    <p>- Có số lớn hơn 1 (1.5)</p>
+                                    <p>=> Vi phạm Quy tắc 1.</p>
+                                </div>
+                            </div>
+
+                            <!-- Bảng D -->
+                            <div class="group border-2 border-slate-200 rounded-lg p-4 hover:border-red-300 transition bg-slate-50">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-lg">Bảng (d): <span class="font-mono bg-white px-2 rounded border text-base">0.5, 0.3, 0.4</span></span>
+                                    <button onclick="toggleExplain('ex-d')" class="bg-white border-2 border-slate-300 text-slate-700 font-hand font-bold px-3 py-1 rounded shadow hover:bg-red-50 hover:text-red-600 transition">Soi Lỗi 🔍</button>
+                                </div>
+                                <div id="ex-d" class="hidden mt-3 bg-red-50 p-3 rounded border border-red-200 font-hand text-xl text-red-800">
+                                    <p>❌ <strong>Sai luôn!</strong></p>
+                                    <p>Cộng thử xem: 0.5 + 0.3 + 0.4 = <strong>1.2</strong></p>
+                                    <p>=> Tổng khác 1. Vi phạm Quy tắc 2.</p>
+                                </div>
+                            </div>
+
+                            <!-- Bảng A & C -->
+                            <div class="border-2 border-green-200 bg-green-50 rounded-lg p-4">
+                                <p class="font-hand text-2xl text-green-700 font-bold">✅ Bảng (a) và (c) là ĐÚNG!</p>
+                                <p class="text-slate-600">Vì thỏa mãn cả giá trị (0-1) và tổng bằng 1.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= TAB 2: BÀI HỌC 2 ================= -->
+            <div id="bai2" class="tab-content pb-10">
+                <!-- Title Sticky Note -->
+                <div class="max-w-md mx-auto bg-pink-200 p-4 shadow-sticker transform rotate-1 mb-8 text-center relative font-hand">
+                    <div class="w-20 h-6 bg-pink-300 opacity-50 absolute -top-3 left-1/2 -translate-x-1/2 rounded"></div> <!-- Tape -->
+                    <h2 class="text-4xl font-bold text-pink-700">Mục 5.2: Đo Đạc</h2>
+                    <p class="text-xl text-slate-700">Trung bình - Phương sai</p>
+                </div>
+
+                <!-- Blackboard Formulas -->
+                <div class="blackboard p-6 rounded-xl shadow-xl max-w-4xl mx-auto mb-10 text-center relative border-8 border-yellow-900">
+                    <div class="absolute bottom-2 right-4 w-12 h-4 bg-white opacity-80 rounded shadow"></div> <!-- Viên phấn -->
+                    
+                    <h3 class="font-hand text-3xl text-white mb-6 underline decoration-wavy decoration-yellow-400">3 Công Thức Cần Nhớ</h3>
+                    
+                    <div class="grid md:grid-cols-3 gap-6 text-white font-hand text-xl">
+                        <div class="border-r-2 border-gray-500 border-dashed last:border-0 p-2">
+                            <p class="text-yellow-300 text-2xl mb-2">Trung bình (\(\mu\))</p>
+                            <p class="text-sm text-gray-400 mb-2">(Kỳ vọng)</p>
+                            <p class="text-2xl">\(\sum [X \cdot P]\)</p>
+                        </div>
+                        <div class="border-r-2 border-gray-500 border-dashed last:border-0 p-2">
+                            <p class="text-pink-300 text-2xl mb-2">Phương sai (\(\sigma^2\))</p>
+                            <p class="text-sm text-gray-400 mb-2">(Độ rủi ro)</p>
+                            <p class="text-2xl">\(\sum [X^2 \cdot P] - \mu^2\)</p>
+                        </div>
+                        <div class="p-2">
+                            <p class="text-green-300 text-2xl mb-2">Độ lệch chuẩn (\(\sigma\))</p>
+                            <p class="text-sm text-gray-400 mb-2">(Căn bậc 2)</p>
+                            <p class="text-2xl">\(\sqrt{\sigma^2}\)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thực hành Hộp bóng -->
+                <div class="note-paper shadow-paper rounded-sm p-8 pl-14 max-w-4xl mx-auto bg-white">
+                    <div class="tape"></div>
+                    <div class="flex flex-col md:flex-row gap-6 items-start">
+                        <div class="flex-1">
+                            <h3 class="font-hand text-3xl font-bold text-blue-900 mb-2">Thực hành 2: Hộp Bóng 📦</h3>
+                            <p class="text-lg mb-4">Hộp 5 quả: 2 quả số 3, 1 quả số 4, 2 quả số 5.</p>
+                            
+                            <!-- Handwritten Table -->
+                            <table class="doodle-table w-full text-center mb-4">
+                                <tr class="bg-gray-100">
+                                    <th>X</th> <td>3</td> <td>4</td> <td>5</td>
+                                </tr>
+                                <tr>
+                                    <th>P(X)</th> <td>0.4</td> <td>0.2</td> <td>0.4</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <!-- Doodle Image -->
+                        <div class="bg-white border-2 border-slate-800 rounded-lg p-4 shadow-sticker transform rotate-2 w-48 text-center">
+                            <div class="flex justify-center gap-2 mb-2">
+                                <div class="w-8 h-8 rounded-full border-2 border-red-500 text-red-500 font-bold flex items-center justify-center">3</div>
+                                <div class="w-8 h-8 rounded-full border-2 border-red-500 text-red-500 font-bold flex items-center justify-center">3</div>
+                                <div class="w-8 h-8 rounded-full border-2 border-yellow-500 text-yellow-500 font-bold flex items-center justify-center">4</div>
+                            </div>
+                            <div class="flex justify-center gap-2">
+                                <div class="w-8 h-8 rounded-full border-2 border-blue-500 text-blue-500 font-bold flex items-center justify-center">5</div>
+                                <div class="w-8 h-8 rounded-full border-2 border-blue-500 text-blue-500 font-bold flex items-center justify-center">5</div>
+                            </div>
+                            <p class="font-hand text-slate-500 mt-2 text-sm">Minh họa cái hộp</p>
+                        </div>
+                    </div>
+
+                    <!-- Step by step -->
+                    <div class="space-y-4 mt-6">
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                            <h4 class="font-hand text-2xl font-bold text-blue-800">Bước 1: Tính Trung bình \(\mu\)</h4>
+                            <p class="font-mono mt-2 ml-4 text-lg text-slate-700">
+                                (3 x 0.4) + (4 x 0.2) + (5 x 0.4)<br>
+                                = 1.2 + 0.8 + 2.0<br>
+                                = <strong class="text-red-600 bg-yellow-200 px-1">4.0</strong>
+                            </p>
+                        </div>
+
+                        <div class="bg-pink-50 border-l-4 border-pink-400 p-4">
+                            <h4 class="font-hand text-2xl font-bold text-pink-800">Bước 2: Tính Phương sai \(\sigma^2\)</h4>
+                            <p class="mb-1 text-slate-700">Nhớ tính \(\mu^2 = 4.0^2 = 16\) trước nhé.</p>
+                            <p class="font-mono mt-2 ml-4 text-lg text-slate-700">
+                                (3²x0.4) + (4²x0.2) + (5²x0.4) - 16<br>
+                                = (3.6 + 3.2 + 10.0) - 16<br>
+                                = 16.8 - 16<br>
+                                = <strong class="text-red-600 bg-yellow-200 px-1">0.8</strong>
+                            </p>
+                        </div>
+
+                        <div class="bg-green-50 border-l-4 border-green-400 p-4">
+                            <h4 class="font-hand text-2xl font-bold text-green-800">Bước 3: Độ lệch chuẩn \(\sigma\)</h4>
+                            <p class="font-mono mt-2 ml-4 text-lg text-slate-700">
+                                \(\sqrt{0.8}\) <br>
+                                \(\approx\) <strong class="text-red-600 bg-yellow-200 px-1">0.894</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= TAB 3: BÀI HỌC 3 (BỔ SUNG) ================= -->
+            <div id="bai3" class="tab-content pb-10">
+                <!-- Title Sticky Note -->
+                <div class="max-w-md mx-auto bg-green-200 p-4 shadow-sticker transform -rotate-1 mb-8 text-center relative font-hand">
+                    <div class="w-3 h-3 rounded-full bg-red-800 absolute top-2 left-1/2 -translate-x-1/2 shadow-inner"></div>
+                    <h2 class="text-4xl font-bold text-green-800">Mục 5.3 & 5.4: Nâng Cao</h2>
+                    <p class="text-xl text-slate-700">Các Loại Phân Phối Khác</p>
+                </div>
+
+                <!-- PHÂN PHỐI NHỊ THỨC (BINOMIAL) -->
+                <div class="note-paper shadow-paper rounded-sm p-8 pl-14 max-w-4xl mx-auto bg-white mb-10">
+                    <div class="tape"></div>
+                    <h3 class="font-hand text-3xl font-bold text-blue-900 mb-2 border-b-2 border-blue-300 inline-block">1. Phân Phối Nhị Thức (Binomial)</h3>
+                    <p class="text-lg mb-2 italic text-slate-500">Ký hiệu: \(X \sim B(n, p)\)</p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <strong class="font-bold text-blue-800">Điều kiện (4 cái phải nhớ):</strong>
+                            <ul class="list-disc ml-5 mt-1 text-slate-700 font-hand text-lg">
+                                <li>Số lần thử \(n\) cố định.</li>
+                                <li>Mỗi lần thử chỉ có 2 kết quả: Thành công (P) hoặc Thất bại (q).</li>
+                                <li>Xác suất \(P\) không đổi.</li>
+                                <li>Các lần thử độc lập nhau.</li>
+                            </ul>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-yellow-50 p-4 rounded-lg border-2 border-yellow-300 border-dashed text-center">
+                                <p class="font-hand text-xl font-bold text-yellow-800">Công Thức Xác Suất</p>
+                                <p class="text-2xl mt-2 font-serif text-slate-800">
+                                    \(P(X=k) = C_n^k \cdot p^k \cdot (1-p)^{n-k}\)
+                                </p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg border-2 border-green-300 border-dashed text-center">
+                                <p class="font-hand text-xl font-bold text-green-800">Đo Lường</p>
+                                <div class="text-left ml-8 mt-2 space-y-1 font-serif">
+                                    <p>1. Trung bình: \(\mu = n \cdot p\)</p>
+                                    <p>2. Phương sai: \(\sigma^2 = n \cdot p \cdot q\)</p>
+                                    <p>3. Độ lệch chuẩn: \(\sigma = \sqrt{npq}\)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ví dụ Nhóm 4 -->
+                        <div class="mt-4 p-4 bg-gray-100 rounded-lg border border-gray-300">
+                            <h4 class="font-hand text-xl font-bold text-slate-700">📝 Ví dụ (Nhóm 4): Tung đồng xu</h4>
+                            <p class="text-slate-600">Tung 5 lần (\(n=5\)). Xác suất mặt sấp là 0.5 (\(p=0.5\)). Tính xác suất có đúng 3 lần sấp (\(k=3\)).</p>
+                            <p class="font-mono mt-2 bg-white p-2 rounded border border-gray-200">
+                                \(P(X=3) = C_5^3 \cdot 0.5^3 \cdot 0.5^{5-3} = 0.3125\)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CÁC PHÂN PHỐI KHÁC -->
+                <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                    <!-- Poisson -->
+                    <div class="bg-white shadow-sticker rounded-xl p-6 border-4 border-indigo-200 transform rotate-1">
+                        <h3 class="font-hand text-2xl font-bold text-indigo-700 mb-2">2. Phân Phối Poisson</h3>
+                        <p class="text-slate-600 text-sm mb-3">Dùng khi sự kiện xảy ra trong một khoảng thời gian/không gian nhất định.</p>
+                        <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-200 text-center">
+                            <p class="font-serif text-lg text-indigo-900">\(P(X=k) = \frac{e^{-\lambda} \cdot \lambda^k}{k!}\)</p>
+                            <p class="text-xs text-indigo-500 mt-1">(\(\lambda\) là số lần xuất hiện trung bình)</p>
+                        </div>
+                    </div>
+
+                    <!-- Siêu Bội -->
+                    <div class="bg-white shadow-sticker rounded-xl p-6 border-4 border-orange-200 transform -rotate-1">
+                        <h3 class="font-hand text-2xl font-bold text-orange-700 mb-2">3. Phân Phối Siêu Bội</h3>
+                        <p class="text-slate-600 text-sm mb-3">Lấy mẫu KHÔNG hoàn lại từ tập hợp N phần tử.</p>
+                        <div class="bg-orange-50 p-3 rounded-lg border border-orange-200 text-center">
+                            <p class="font-serif text-lg text-orange-900">\(P(X=k) = \frac{C_M^k \cdot C_{N-M}^{n-k}}{C_N^n}\)</p>
+                            <p class="text-xs text-orange-500 mt-1">(Chọn k phần tử loại A trong n lần lấy)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= TAB 4: MÁY TÍNH ================= -->
+            <div id="maytinh" class="tab-content pb-10">
+                <div class="text-center mb-6">
+                     <h2 class="font-hand text-4xl font-bold text-slate-700 inline-block border-b-4 border-yellow-300">🧮 Máy Tính Bỏ Túi</h2>
+                     <p class="text-slate-500 mt-2 font-hand text-xl">Nhập số vào đây, mình tính giúp cho!</p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <!-- Input Panel -->
+                    <div class="bg-white p-6 rounded shadow-sticker border border-slate-300 relative transform -rotate-1">
+                        <div class="absolute -top-4 -right-4 w-12 h-12 bg-yellow-100 rounded-full border-2 border-yellow-300 flex items-center justify-center text-2xl shadow">✏️</div>
+                        <h3 class="font-hand text-2xl font-bold mb-4">Nhập Dữ Liệu:</h3>
+                        
+                        <form id="calc-form" onsubmit="event.preventDefault(); calculate();" class="space-y-3">
+                            <div id="input-rows" class="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                                <!-- Rows injected here -->
+                            </div>
+                            <div class="flex gap-2 mt-4 pt-4 border-t-2 border-dashed border-slate-200">
+                                <button type="button" onclick="addRow()" class="flex-1 bg-green-100 text-green-800 font-hand text-xl font-bold py-2 rounded border-2 border-green-200 hover:bg-green-200">
+                                    + Thêm dòng
+                                </button>
+                                <button type="submit" class="flex-1 bg-blue-600 text-white font-hand text-xl font-bold py-2 rounded shadow hover:bg-blue-700 transform hover:scale-105 transition">
+                                    Tính Ngay! 🚀
+                                </button>
+                            </div>
+                            <button type="button" onclick="resetCalculator()" class="w-full text-slate-400 font-hand text-lg underline hover:text-slate-600">Làm lại ví dụ Hộp bóng</button>
+                        </form>
+                    </div>
+
+                    <!-- Result Panel -->
+                    <div class="lg:col-span-2">
+                        <!-- Cards Kết quả -->
+                        <div class="grid grid-cols-3 gap-4 mb-6">
+                            <div class="bg-blue-600 text-white p-4 rounded-xl shadow-lg border-4 border-blue-700 text-center transform hover:-translate-y-1 transition">
+                                <div class="font-hand text-xl opacity-80">Trung bình (\(\mu\))</div>
+                                <div id="res-mean" class="font-mono text-3xl font-bold mt-1">--</div>
+                            </div>
+                            <div class="bg-pink-500 text-white p-4 rounded-xl shadow-lg border-4 border-pink-600 text-center transform hover:-translate-y-1 transition">
+                                <div class="font-hand text-xl opacity-80">Phương sai (\(\sigma^2\))</div>
+                                <div id="res-var" class="font-mono text-3xl font-bold mt-1">--</div>
+                            </div>
+                            <div class="bg-green-500 text-white p-4 rounded-xl shadow-lg border-4 border-green-600 text-center transform hover:-translate-y-1 transition">
+                                <div class="font-hand text-xl opacity-80">Độ lệch chuẩn (\(\sigma\))</div>
+                                <div id="res-std" class="font-mono text-3xl font-bold mt-1">--</div>
+                            </div>
+                        </div>
+
+                        <!-- Detail Table -->
+                        <div class="bg-white rounded-lg shadow-paper p-1 border-2 border-slate-800 overflow-hidden">
+                            <table class="w-full text-center doodle-table">
+                                <thead class="bg-slate-200 text-slate-700">
+                                    <tr>
+                                        <th class="p-3">X</th>
+                                        <th class="p-3">P(X)</th>
+                                        <th class="p-3 text-blue-700">X \(\cdot\) P</th>
+                                        <th class="p-3 text-pink-700">X\(^2\) \(\cdot\) P</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detail-body" class="text-slate-700 font-hand text-xl">
+                                    <tr><td colspan="4" class="p-8 text-slate-400">Đang chờ bạn bấm tính...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- JS LOGIC -->
+    <script>
+        // --- 1. INTRO SCREEN LOGIC ---
+        function enterApp() {
+            const displayName = "Nhóm 3"; // Đặt tên cứng luôn
+            
+            // Update Header Name
+            document.getElementById('display-group-name').innerText = displayName;
+
+            // Animation: Slide Intro Up & Fade In Main App
+            const introScreen = document.getElementById('intro-screen');
+            const mainApp = document.getElementById('main-app');
+
+            introScreen.classList.add('slide-up');
+            
+            setTimeout(() => {
+                introScreen.style.display = 'none'; // Remove from flow after anim
+                mainApp.classList.remove('hidden');
+                mainApp.classList.add('fade-in-content');
+            }, 700); // Wait for slide animation
+        }
+
+        // --- 2. TAB SWITCHING ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            // Reset button styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === tabId) {
+                    btn.classList.add('bg-white', 'text-slate-800', 'active');
+                    btn.classList.remove('bg-yellow-100', 'bg-slate-600', 'text-gray-300', 'bg-green-100');
+                    if(tabId === 'bai1') btn.classList.add('bg-yellow-100');
+                    if(tabId === 'bai3') btn.classList.add('bg-green-100'); 
+                } else {
+                    btn.classList.remove('active', 'bg-white', 'text-slate-800', 'bg-yellow-100', 'bg-green-100');
+                    btn.classList.add('bg-slate-600', 'text-gray-300');
+                }
+            });
+        }
+
+        // --- 3. TOGGLE EXPLAIN ---
+        function toggleExplain(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
+
+        // --- 4. CALCULATOR LOGIC ---
+        function addRow(x = '', p = '') {
+            const container = document.getElementById('input-rows');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center bg-slate-50 p-2 rounded border border-dashed border-slate-300';
+            div.innerHTML = `
+                <input type="number" step="any" placeholder="X" value="${x}" class="calc-x w-1/3 p-1 border-b-2 border-slate-300 bg-transparent text-center font-hand text-xl focus:outline-none focus:border-blue-500" required>
+                <input type="number" step="any" placeholder="P(X)" value="${p}" class="calc-p w-1/3 p-1 border-b-2 border-slate-300 bg-transparent text-center font-hand text-xl focus:outline-none focus:border-blue-500" required>
+                <button type="button" onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600 text-xl"><i class="fa-solid fa-eraser"></i></button>
+            `;
+            container.appendChild(div);
+        }
+
+        function resetCalculator() {
+            const container = document.getElementById('input-rows');
+            container.innerHTML = '';
+            // Load Example 5.2.4 Data
+            addRow(3, 0.4);
+            addRow(4, 0.2);
+            addRow(5, 0.4);
+        }
+
+        function calculate() {
+            const xInputs = document.querySelectorAll('.calc-x');
+            const pInputs = document.querySelectorAll('.calc-p');
+            let data = [];
+            let sumP = 0;
+
+            xInputs.forEach((xIn, i) => {
+                const x = parseFloat(xIn.value);
+                const p = parseFloat(pInputs[i].value);
+                if (!isNaN(x) && !isNaN(p)) {
+                    data.push({x, p});
+                    sumP += p;
+                }
+            });
+
+            if (Math.abs(sumP - 1) > 0.001) {
+                alert(`⚠️ Ê bạn ơi, Tổng P(X) = ${sumP.toFixed(2)} (Khác 1). Coi chừng tính sai nha!`);
+            }
+
+            let mean = 0;
+            let sumX2P = 0;
+            let html = '';
+
+            data.forEach(item => {
+                const xp = item.x * item.p;
+                const x2p = (item.x * item.x) * item.p;
+                mean += xp;
+                sumX2P += x2p;
+
+                html += `
+                    <tr class="hover:bg-yellow-50">
+                        <td class="p-2 font-bold">${item.x}</td>
+                        <td class="p-2">${item.p}</td>
+                        <td class="p-2 text-blue-600 font-bold">${xp.toFixed(2)}</td>
+                        <td class="p-2 text-pink-600 font-bold">${x2p.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            const variance = sumX2P - (mean * mean);
+            const stdDev = Math.sqrt(variance);
+
+            document.getElementById('res-mean').innerText = mean.toFixed(4);
+            document.getElementById('res-var').innerText = variance.toFixed(4);
+            document.getElementById('res-std').innerText = stdDev.toFixed(4);
+            document.getElementById('detail-body').innerHTML = html;
+        }
+
+        // Init
+        resetCalculator();
+    </script>
+</body>
+</html>
